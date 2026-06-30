@@ -246,7 +246,7 @@ class CRPS_GUI{
   }  
   startFromInput(){  
     try{  
-      const nums=this.rowsInput.value.trim().split(/\s+/).map(Number);  
+      const nums=this.rowsInput.value.trim().split(/\s+/).map(Number).filter(n => n > 0).sort((a, b) => b - a);  
       if(nums.length===0||nums.some(n=>!Number.isInteger(n)||n<=0))throw new Error();  
       // Support both legacy 'ai-select' and new 'cpu-side' selector ids
       const cpuSelectEl = document.getElementById('cpu-side') || document.getElementById('ai-select');
@@ -299,7 +299,7 @@ class CRPS_GUI{
         
     }catch{alert('Please enter positive integers separated by spaces.');}  
     if(this.vsCPU&&this.state.player===this.getPlayerFromLetter(this.cpuSide)){  
-      setTimeout(()=>this.aiTurnBasic(),1000);  
+      setTimeout(()=>this.aiTurnBasic(),1300);  
     }  
   }  
   
@@ -549,7 +549,7 @@ class CRPS_GUI{
       const playerRole = this.state.player === Player.RED ? 'Rows' : 'Columns';
       this.statusLabel.textContent=`Player ${playerLetter} (${playerType}, ${playerRole}) to move`;  
         
-      if(this.vsCPU&&this.state.player===this.getPlayerFromLetter(this.cpuSide))setTimeout(()=>this.aiTurnBasic(),300);  
+      if(this.vsCPU&&this.state.player===this.getPlayerFromLetter(this.cpuSide))setTimeout(()=>this.aiTurnBasic(),500);  
     },300);  
   }
 

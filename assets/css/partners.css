@@ -65,19 +65,17 @@
 .pt-divicon.collaborator.orange .pt-mk-pin { box-shadow: 0 0 0 4px color-mix(in srgb, var(--s-orange) 16%, transparent), 0 0 14px var(--s-orange); }
 .pt-divicon.collaborator .pt-mk-label { font-size: 11px; opacity: .9; }
 
-/* member markers (revealed when zoomed in) */
+/* member markers (revealed when zoomed in, or on hover over an institution) —
+   one consistent style for every researcher: black fill, orange outline. */
 .pt-memicon { overflow: visible !important; }
 .pt-mem { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transform: translate(-50%, -50%); }
 .pt-mem .blk {
     width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center;
-    font-family: var(--s-mono); font-weight: 700; font-size: 12px; color: #04201c;
-    background: var(--s-cyan); box-shadow: 0 0 18px color-mix(in srgb, var(--s-cyan) 60%, transparent);
+    font-family: var(--s-mono); font-weight: 700; font-size: 12px; color: var(--s-orange);
+    background: #0a0a0a; border: 2px solid var(--s-orange);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--s-orange) 45%, transparent);
     transition: transform .2s var(--s-ease);
 }
-.pt-memicon.orange .pt-mem .blk { background: var(--s-orange); color: #2a0f04; box-shadow: 0 0 18px color-mix(in srgb, var(--s-orange) 60%, transparent); }
-/* collaborators: outlined block so the core team reads first */
-.pt-memicon.collab .pt-mem .blk { background: transparent; color: var(--s-cyan); border: 2px solid var(--s-cyan); box-shadow: none; }
-.pt-memicon.collab.orange .pt-mem .blk { color: var(--s-orange); border-color: var(--s-orange); }
 .pt-mem:hover .blk { transform: scale(1.15); }
 .pt-mem .nm { font-family: var(--s-mono); font-size: 10.5px; color: #dfe7f5; background: rgba(8,12,22,.8); padding: 2px 7px; border-radius: 6px; white-space: nowrap; }
 
@@ -112,7 +110,18 @@
 .pt-card-big .rl { font-family: var(--s-mono); font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--s-cyan); margin-top: 8px; }
 .pt-card-big.orange .rl { color: var(--s-orange); }
 .pt-card-big .inst { font-family: var(--s-mono); font-size: 12px; color: #9fb2cf; margin-top: 6px; }
+.pt-card-big .inst a { color: var(--s-cyan); }
+.pt-card-big.orange .inst a { color: var(--s-orange); }
 .pt-card-big .bio { color: #c7d2e2; font-size: 1.02rem; line-height: 1.75; margin-top: 22px; }
+.pt-contact { display: inline-block; margin-top: 16px; font-family: var(--s-mono); font-size: 13px; color: var(--s-orange);
+    border: 1px solid var(--s-orange); border-radius: 8px; padding: 6px 14px; text-decoration: none; }
+.pt-contact-tbd { color: var(--s-dim); border-color: var(--s-stroke); }
+
+/* institution markers that have a real logo file, instead of the glow pin */
+.pt-mk-logo { width: 28px; height: 28px; border-radius: 6px; background: #fff; display: grid; place-items: center;
+    box-shadow: 0 0 0 2px var(--s-orange), 0 0 14px color-mix(in srgb, var(--s-orange) 50%, transparent);
+    transform: rotate(0deg) translate(-6px, -6px); animation: none; }
+.pt-mk-logo img { width: 100%; height: 100%; object-fit: contain; padding: 2px; }
 
 /* equal-partners strip */
 .pt-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 22px; }
@@ -121,6 +130,7 @@
 .pt-strip .pt-card .nm { font-family: var(--s-display); font-weight: 700; font-size: 1.1rem; color: var(--s-text); }
 .pt-strip .pt-card .lc { font-family: var(--s-mono); font-size: 12px; color: var(--s-muted); margin-top: 6px; }
 .pt-strip .pt-card .ct { font-family: var(--s-mono); font-size: 11px; color: var(--s-dim); margin-top: 10px; text-transform: uppercase; letter-spacing: .1em; }
+.pt-strip .pt-card .pt-site-link { display: inline-block; margin-top: 10px; font-family: var(--s-mono); font-size: 11px; color: var(--s-cyan); text-decoration: none; }
 
 /* collaborators list */
 .pt-collabs-title { font-family: var(--s-display); font-weight: 700; font-size: 1.3rem; color: var(--s-text); margin: 34px 0 16px; }

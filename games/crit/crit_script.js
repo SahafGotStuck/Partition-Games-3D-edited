@@ -290,7 +290,7 @@ const Sound = {
 // 5.  GUI controller with row and column move support
 // ────────────────────────────────────────────────────────────  
 class CRITGui {  
-  CELL=40; MARGIN=20; ANIM=350; AI_WAIT=650;
+  CELL=40; MARGIN=20; ANIM=450; AI_WAIT=900;
   currentCellSize = this.CELL; // Dynamic cell size  
   GAP = 1; // Gap between tiles
   
@@ -469,7 +469,7 @@ class CRITGui {
   /* game start/stop */  
   start() {  
     try {  
-      const vals = this.rowsIn.value.trim().split(/\s+/).map(Number);  
+      const vals = this.rowsIn.value.trim().split(/\s+/).map(Number).filter(n => n > 0).sort((a, b) => b - a);  
       if (!vals.length || vals.some(v => !Number.isInteger(v) || v <= 0)) throw 0;  
       const aiPlayer = this.aiSel.value === "None" ? null : this.aiSel.value;
       const difficulty = this.difficultySlider.value <= 33 ? "Easy" : 

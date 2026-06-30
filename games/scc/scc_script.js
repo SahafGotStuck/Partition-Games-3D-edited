@@ -600,7 +600,7 @@ class GameUI {
             
             const rowsText = this.rowsInput.value.trim();
             
-            const rows = rowsText.split(/\s+/).map(x => parseInt(x)).filter(x => x > 0);
+            const rows = rowsText.split(/\s+/).map(x => parseInt(x)).filter(x => x > 0).sort((a, b) => b - a);
             
             if (rows.length === 0) {
                 throw new Error('Invalid partition');
@@ -840,7 +840,7 @@ class GameUI {
             } else {
                 this.updateStatus();
             }
-        }, 800);
+        }, 1100);
     }
 
     // Status updates

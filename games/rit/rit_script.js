@@ -247,7 +247,7 @@ class Game {
 // 5.  GUI controller   (hover logic updated)  
 // ────────────────────────────────────────────────────────────  
 class RITGui {  
-  CELL=40; GAP=1; MARGIN=20; ANIM=350; AI_WAIT=650; // Small gap between tiles to prevent border overlap
+  CELL=40; GAP=1; MARGIN=20; ANIM=450; AI_WAIT=900; // Small gap between tiles to prevent border overlap
   currentCellSize = this.CELL; // Dynamic cell size  
   
   constructor() {  
@@ -309,7 +309,7 @@ class RITGui {
   
   /* ---------- game start / AI ---------- */  
   start() {  
-    const rows = this.rowsIn.value.trim().split(/\s+/).map(Number)  
+    const rows = this.rowsIn.value.trim().split(/\s+/).map(Number).filter(n => n > 0).sort((a, b) => b - a)  
                   .filter(n=>Number.isInteger(n)&&n>0);  
     if (!rows.length || rows.some((n,i,a)=>i && n>a[i-1])) {  
       alert("Enter a non-increasing list of positive integers.");  

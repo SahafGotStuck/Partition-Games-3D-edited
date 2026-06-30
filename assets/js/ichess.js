@@ -438,6 +438,7 @@
               '<option value="staircase">staircase</option><option value="rectangle">rectangle (square)</option>' +
               '<option value="random">random</option></select>' +
               '<input type="number" id="ic-genn" min="2" max="14" value="6" style="max-width:74px">' +
+              '<span id="ic-genn-hint" class="partition-number-hint" style="font-size:12px;opacity:.65;white-space:nowrap">rows</span>' +
               '<button type="button" id="ic-genbtn" class="secondary-button">generate</button></div>' +
             '<label>Mode</label>' +
             '<div class="input-group"><select id="ic-mode"><option value="normal" selected>Normal (last move wins)</option>' +
@@ -453,13 +454,24 @@
     function overModalHTML() {
         return '<div id="ic-over" class="modal-backdrop"><div class="modal">' +
             '<h2 id="ic-over-title">Game over</h2><p id="ic-over-msg"></p>' +
-            '<button id="ic-again" class="modal-btn">play again</button></div></div>';
+            '<button id="ic-again" class="modal-btn">play again</button>' +
+            '<a href="../../index.html" class="secondary-button" style="display:block;text-align:center;margin-top:10px;text-decoration:none">&larr; quit to home</a>' +
+        '</div></div>';
     }
     function wireSetup(state, refs, begin) {
         const diff = document.getElementById("ic-diff"), lbl = document.getElementById("ic-difflabel");
         const name = v => v >= 85 ? "Perfect" : v >= 60 ? "Hard" : v >= 35 ? "Medium" : "Easy";
         diff.addEventListener("input", () => lbl.textContent = name(+diff.value) + " (" + diff.value + ")");
         const rowsInput = document.getElementById("ic-rows");
+        const genType = document.getElementById("ic-gentype"), genN = document.getElementById("ic-genn"), genHint = document.getElementById("ic-genn-hint");
+        const GEN_HINTS = { staircase: "rows", rectangle: "side length (n \u00D7 n)", random: "max size" };
+        const updateGenHint = () => {
+            const h = GEN_HINTS[genType.value] || "rows";
+            genHint.textContent = h;
+            genN.title = "Enter the " + h + " for the " + genType.value + " shape.";
+        };
+        genType.addEventListener("change", updateGenHint);
+        updateGenHint();
         document.getElementById("ic-genbtn").addEventListener("click", () => {
             rowsInput.value = genPartition(document.getElementById("ic-gentype").value, +document.getElementById("ic-genn").value).join(" ");
         });

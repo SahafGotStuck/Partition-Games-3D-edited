@@ -236,8 +236,8 @@ class ProLCTRGui {
         this.CELL = 40; 
         this.MARGIN = 20; 
         this.LABEL = 20;
-        this.ANIMATION_MS = 500; 
-        this.AI_THINK_MS = 800;
+        this.ANIMATION_MS = 650; 
+        this.AI_THINK_MS = 1100;
         this.game = null; 
         this.isAnimating = false; 
         this.aiDifficultyValue = 50;

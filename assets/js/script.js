@@ -7,6 +7,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     initializeAboutPopover();
     initializeThemeToggle();
+    initPartitionShapeHints();
     // Space for future functionality initialization
 });
 
@@ -216,4 +217,46 @@ function initializeMultiplayer() {
 // Placeholder for offline functionality
 function initializeOfflineSupport() {
     // TODO: Implement service worker and offline capabilities
+}
+
+/**
+ * Partition-shape number hints
+ * The setup modal on every game has a "Shape" dropdown (random / staircase /
+ * square / hook / ...) paired with a plain number input whose meaning isn't
+ * obvious on its own. This finds every such pair on the page (by id pattern,
+ * so it works for the main setup form AND any "multiplayer-" prefixed one)
+ * and keeps a small inline hint + placeholder in sync with the chosen shape,
+ * e.g. "staircase" -> "rows", "square" -> "side length (n x n)".
+ */
+function initPartitionShapeHints() {
+    var HINTS = {
+        random:    { label: 'sum of parts', example: 'e.g., 25' },
+        staircase: { label: 'rows',         example: 'e.g., 6' },
+        square:    { label: 'side length (n \u00D7 n)', example: 'e.g., 5' },
+        hook:      { label: 'size',         example: 'e.g., 10' },
+        rectangle: { label: 'rows \u00D7 columns', example: 'e.g., 5' },
+        triangle:  { label: 'rows',         example: 'e.g., 6' }
+    };
+    var selects = document.querySelectorAll('select[id$="partition-type-select"]');
+    selects.forEach(function (select) {
+        var prefix = select.id.slice(0, select.id.length - 'partition-type-select'.length);
+        var numberInput = document.getElementById(prefix + 'partition-number-input');
+        if (!numberInput) return;
+
+        var hint = numberInput.parentElement.querySelector('.partition-number-hint');
+        if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'partition-number-hint';
+            numberInput.insertAdjacentElement('afterend', hint);
+        }
+
+        function update() {
+            var info = HINTS[select.value] || { label: 'size', example: 'e.g., 25' };
+            hint.textContent = info.label;
+            numberInput.placeholder = info.example;
+            numberInput.title = 'Enter the ' + info.label + ' for the ' + select.value + ' shape.';
+        }
+        select.addEventListener('change', update);
+        update();
+    });
 }

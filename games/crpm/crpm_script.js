@@ -280,8 +280,8 @@ class CRPMGui {
         this.CELL = 40; 
         this.MARGIN = 20; 
         this.LABEL = 20;
-        this.ANIMATION_MS = 500; 
-        this.AI_THINK_MS = 800;
+        this.ANIMATION_MS = 650; 
+        this.AI_THINK_MS = 1100;
         this.game = null; 
         this.isAnimating = false; 
         this.aiDifficultyValue = 50;
@@ -411,7 +411,7 @@ class CRPMGui {
         
         let rows;
         try {
-            rows = rowsText.split(/\s+/).map(x => parseInt(x.trim())).filter(x => x > 0);
+            rows = rowsText.split(/\s+/).map(x => parseInt(x.trim())).filter(x => x > 0).sort((a, b) => b - a);
             if (rows.length === 0) throw new Error("No valid rows");
         } catch (e) {
             alert("Please enter valid row lengths (e.g., '5 4 4 2')");

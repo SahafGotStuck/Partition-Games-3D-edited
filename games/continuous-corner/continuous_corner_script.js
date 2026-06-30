@@ -514,7 +514,7 @@ class ContinuousCornerGui {
         
         let rows;
         try {
-            rows = rowsText.split(/\s+/).map(x => parseInt(x.trim())).filter(x => x > 0);
+            rows = rowsText.split(/\s+/).map(x => parseInt(x.trim())).filter(x => x > 0).sort((a, b) => b - a);
             if (rows.length === 0) throw new Error("No valid rows");
         } catch (e) {
             alert("Please enter valid row lengths (e.g., '5 4 4 2')");
@@ -917,7 +917,7 @@ class ContinuousCornerGui {
                 // Fallback to default move
                 this.executeWithAnimation();
             }
-        }, 650);
+        }, 1000);
     }
 
     generatePartition() {

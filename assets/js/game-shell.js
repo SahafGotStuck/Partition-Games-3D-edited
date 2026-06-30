@@ -276,12 +276,37 @@
         refreshTurn();
     }
 
+    function injectQuitNav() {
+        // Header: a clearly-labeled "quit" button, not just the small logo link.
+        var nav = document.querySelector(".header-right nav");
+        if (nav && !document.getElementById("pg-quit-header")) {
+            var btn = el("a", "nav-button pg-quit-btn",
+                '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px"><path d="M15 18l-6-6 6-6"/></svg>quit');
+            btn.id = "pg-quit-header";
+            btn.href = "../../index.html";
+            btn.title = "Leave this game and return to the games list";
+            nav.insertBefore(btn, nav.firstChild);
+        }
+
+        // Side panel: a persistent quit card, visible throughout play and after game over.
+        var panel = document.getElementById("pg-panel");
+        if (panel && !document.getElementById("pg-quit-panel")) {
+            var card = el("div", "pg-card");
+            card.innerHTML =
+                '<a id="pg-quit-panel" class="pg-chip" href="../../index.html" style="display:block;text-align:center;text-decoration:none">' +
+                    '&larr; quit to home' +
+                '</a>';
+            panel.appendChild(card);
+        }
+    }
+
     function init() {
         try {
             alignTheme();
             injectBackground();
             var code = gameCode();
             if (buildPanel(code)) watchBoard();
+            injectQuitNav();
         } catch (e) { /* never break the game */ if (window.console) console.warn("pg-shell:", e); }
     }
 

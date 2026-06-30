@@ -329,8 +329,8 @@ class AnticornersGui {
     constructor() {
         this.CELL = 40;
         this.MARGIN = 20;
-        this.ANIMATION_MS = 500;
-        this.AI_THINK_MS = 800;
+        this.ANIMATION_MS = 650;
+        this.AI_THINK_MS = 1100;
         
         this.game = null;
         this.hoveredMove = null;
@@ -417,7 +417,7 @@ class AnticornersGui {
     
     processSetup() {
         try {
-            const nums = this.rowsInput.value.trim().split(/\s+/).map(Number);
+            const nums = this.rowsInput.value.trim().split(/\s+/).map(Number).filter(n => n > 0).sort((a, b) => b - a);
             if (nums.length === 0 || nums.some(n => isNaN(n) || n <= 0)) {
                 throw new Error("Invalid input");
             }

@@ -257,7 +257,7 @@ class CRIM_GUI{
   }  
   startFromInput(){  
     try{  
-      const nums=this.rowsInput.value.trim().split(/\s+/).map(Number);  
+      const nums=this.rowsInput.value.trim().split(/\s+/).map(Number).filter(n => n > 0).sort((a, b) => b - a);  
       if(nums.length===0||nums.some(n=>!Number.isInteger(n)||n<=0))throw new Error();  
       this.cpuSide=document.getElementById('ai-select').value;  
       this.vsCPU=(this.cpuSide!=='None');  
@@ -307,7 +307,7 @@ class CRIM_GUI{
         
     }catch{alert('Please enter positive integers separated by spaces.');}  
     if(this.vsCPU&&this.state.player===this.getPlayerFromLetter(this.cpuSide)){  
-      setTimeout(()=>this.aiTurnPerfect(),1000);  
+      setTimeout(()=>this.aiTurnPerfect(),1300);  
     }  
   }  
   
@@ -527,7 +527,7 @@ class CRIM_GUI{
       const playerType=this.vsCPU&&this.state.player===this.getPlayerFromLetter(this.cpuSide)?'Computer':'Human';  
       this.statusLabel.textContent=`Player ${playerLetter} (${playerType}) to move`;  
         
-      if(this.vsCPU&&this.state.player===this.getPlayerFromLetter(this.cpuSide))setTimeout(()=>this.aiTurnPerfect(),300);  
+      if(this.vsCPU&&this.state.player===this.getPlayerFromLetter(this.cpuSide))setTimeout(()=>this.aiTurnPerfect(),500);  
     },300);  
   }  
   
