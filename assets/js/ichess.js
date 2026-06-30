@@ -1,35 +1,40 @@
 /* ============================================================
    PARTITION GAMES 3D · iChess — Impartial Chess games
-   Single-piece combinatorial games (move toward the corner,
-   last move wins / misère = last move loses). Perfect play via
-   Sprague–Grundy values computed by memoised recursion, so the
-   AI is provably optimal for the defined move set.
+   Single-piece combinatorial games (move away from the start
+   corner, last move wins / misère = last move loses). Perfect
+   play via Sprague–Grundy values computed by memoised
+   recursion, so the AI is provably optimal for the defined
+   move set.
 
    Reference: impartial chess / "iChess" (arXiv:2501.14640).
-   Coordinates: (c, r), c=0 leftmost column, r=0 bottom row.
-   Target corner = (0, 0). Every move strictly decreases a
-   well-founded potential, guaranteeing the game terminates.
+   Coordinates: (c, r), c=0 leftmost column, r=0 TOP row.
+   The piece always begins at (0, 0) — the upper-left corner —
+   and every move strictly increases a well-founded potential
+   (column and/or row index), guaranteeing the game terminates
+   at one of the diagram's "outer corners" (a cell with no
+   legal move left).
    ============================================================ */
 (function () {
     "use strict";
 
     /* ---------------- board = arbitrary partition (Young diagram) ----------------
-       rows[r] = width of row r; rows non-increasing; rows[0] is the BOTTOM row
-       (widest). A cell (c, r) exists iff 0<=r<rows.length and 0<=c<rows[r]. The
-       corner is (0,0); the diagram is downward-closed toward it, so a rectangle
-       is just the special case rows = [n, n, …, n]. Sliding pieces stop at the
-       first cell that is off the partition, so play is confined to the shape. */
+       rows[r] = width of row r; rows non-increasing; rows[0] is the TOP row
+       (widest, English notation: longest row at top, shortest at bottom). A
+       cell (c, r) exists iff 0<=r<rows.length and 0<=c<rows[r]. The piece
+       starts at (0,0), the upper-left corner, and a rectangle is just the
+       special case rows = [n, n, …, n]. Sliding pieces stop at the first
+       cell that is off the partition, so play is confined to the shape. */
     function inBoard(c, r, rows) { return r >= 0 && r < rows.length && c >= 0 && c < rows[r]; }
 
     function rookMoves(c, r, rows) {
         const m = [];
-        for (let k = 1; inBoard(c - k, r, rows); k++) m.push([c - k, r]);   // left
-        for (let k = 1; inBoard(c, r - k, rows); k++) m.push([c, r - k]);   // down
+        for (let k = 1; inBoard(c + k, r, rows); k++) m.push([c + k, r]);   // right
+        for (let k = 1; inBoard(c, r + k, rows); k++) m.push([c, r + k]);   // down
         return m;
     }
     function bishopMoves(c, r, rows) {
         const m = [];
-        for (let k = 1; inBoard(c - k, r - k, rows); k++) m.push([c - k, r - k]); // down-left
+        for (let k = 1; inBoard(c + k, r + k, rows); k++) m.push([c + k, r + k]); // down-right
         return m;
     }
     function queenMoves(c, r, rows) { return rookMoves(c, r, rows).concat(bishopMoves(c, r, rows)); }
@@ -38,10 +43,10 @@
         for (const [dc, dr] of deltas) if (inBoard(c + dc, r + dr, rows)) m.push([c + dc, r + dr]);
         return m;
     }
-    const KING_D = [[-1, 0], [0, -1], [-1, -1]];
-    // Corner-the-Knight: knight deltas whose column+row sum strictly decreases.
-    const KNIGHT_D = [[-1, -2], [-2, -1], [-2, 1], [1, -2]];
-    const PAWN_D = [[0, -1], [-1, -1], [1, -1]];
+    const KING_D = [[1, 0], [0, 1], [1, 1]];
+    // Corner-the-Knight: knight deltas whose column+row sum strictly increases.
+    const KNIGHT_D = [[1, 2], [2, 1], [2, -1], [-1, 2]];
+    const PAWN_D = [[0, 1], [-1, 1], [1, 1]];
     function kingMoves(c, r, rows) { return stepMoves(c, r, rows, KING_D); }
     function knightMoves(c, r, rows) { return stepMoves(c, r, rows, KNIGHT_D); }
     function pawnMoves(c, r, rows) { return stepMoves(c, r, rows, PAWN_D); }
@@ -49,24 +54,24 @@
 
     const PIECES = {
         rook:    { name: "Rook",    glyph: "♜", family: "line", gen: rookMoves,
-                   tagline: "Slides left or down toward the corner.",
+                   tagline: "Slides right or down from the corner.",
                    theory: "On a rectangle the Rook game is <strong>two-pile Nim</strong> with Grundy value <strong>column XOR row</strong>; on a partition the engine confines the slides to the Young diagram and recomputes Grundy values directly.",
                    win: "Move to a position with <strong>Grundy value 0</strong> (on a full board, column XOR row = 0)." },
         bishop:  { name: "Bishop",  glyph: "♝", family: "line", gen: bishopMoves,
-                   tagline: "Slides down-left along its diagonal.",
+                   tagline: "Slides down-right along its diagonal.",
                    theory: "A lone Bishop rides one diagonal — a <strong>single Nim heap</strong> of length min(column, row) on a rectangle. On a partition the diagonal stops at the edge of the diagram.",
                    win: "Force your opponent off the diagonal first — leave a <strong>Grundy-0</strong> position." },
         queen:   { name: "Queen",   glyph: "♛", family: "line", gen: queenMoves,
-                   tagline: "Rook + Bishop moves toward the corner.",
+                   tagline: "Rook + Bishop moves away from the corner.",
                    theory: "On a rectangle the Queen game is exactly <strong>Wythoff’s game</strong> (golden-ratio losing positions). On a partition the engine computes Grundy values over the diagram’s cells.",
                    win: "Move to a <strong>Grundy-0</strong> position (a Wythoff P-position on a full board)." },
         king:    { name: "King",    glyph: "♚", family: "step", gen: kingMoves,
-                   tagline: "One step left, down, or down-left.",
-                   theory: "The King steps one cell toward the corner. On a rectangle the safe squares are where column and row are both even; on a partition the engine recomputes them by recursion.",
+                   tagline: "One step right, down, or down-right.",
+                   theory: "The King steps one cell away from the corner. On a rectangle the safe squares are where column and row are both even; on a partition the engine recomputes them by recursion.",
                    win: "Leave your opponent on a <strong>Grundy-0</strong> cell." },
         knight:  { name: "Knight",  glyph: "♞", family: "leap", gen: knightMoves,
-                   tagline: "L-shaped leaps that close on the corner.",
-                   theory: "“Corner the Knight” — only the knight leaps whose column+row strictly decrease are legal (and only onto cells of the partition), so the game is finite. No closed form, so the engine computes <strong>Grundy values by memoised recursion</strong>.",
+                   tagline: "L-shaped leaps that march toward the corners.",
+                   theory: "“Corner the Knight” — only the knight leaps whose column+row strictly increase are legal (and only onto cells of the partition), so the game is finite. No closed form, so the engine computes <strong>Grundy values by memoised recursion</strong>.",
                    win: "Hand your opponent a <strong>Grundy-0</strong> cell; analysis mode highlights the safe ones." },
         pawn:    { name: "Pawn",    glyph: "♟", family: "march", gen: pawnMoves,
                    tagline: "Marches down one rank (straight or diagonal).",
@@ -141,17 +146,8 @@
         return r.length ? r : [n];
     }
     function startCell(rows, mode) {
-        if (mode === "random") {
-            const cells = [];
-            for (let r = 0; r < rows.length; r++) for (let c = 0; c < rows[r]; c++) if (c + r >= 2) cells.push([c, r]);
-            if (cells.length) return cells[(Math.random() * cells.length) | 0];
-        }
-        let best = [0, 0], score = -1;                 // farthest cell from the corner
-        for (let r = 0; r < rows.length; r++) for (let c = 0; c < rows[r]; c++) {
-            const s = c + r + r * 0.001;
-            if (s > score) { score = s; best = [c, r]; }
-        }
-        return best;
+        // The piece always begins at the upper-left corner of the diagram.
+        return [0, 0];
     }
 
     /* ---------------- node export (for the test harness) ---------------- */
@@ -289,12 +285,14 @@
             const rows = state.rows, H = rows.length, maxW = Math.max.apply(null, rows);
             b.style.setProperty("--w", maxW);
             b.style.setProperty("--h", H);
-            for (let r = H - 1; r >= 0; r--) {
+            for (let r = 0; r < H; r++) {              // r=0 (widest row) at the TOP
                 for (let c = 0; c < maxW; c++) {
                     if (c >= rows[r]) { b.appendChild(el("div", "ic-sq empty")); continue; } // off the partition
                     const sq = el("div", "ic-sq " + (((c + r) % 2 === 0) ? "dark" : "light"));
                     sq.dataset.c = c; sq.dataset.r = r;
-                    if (c === 0 && r === 0) sq.classList.add("corner");
+                    // an "outer corner" is any cell from which this piece has no
+                    // legal move left — the game-ending cells for the current piece.
+                    if (state.solver && state.solver.legal(c, r).length === 0) sq.classList.add("corner");
                     sq.addEventListener("click", () => onSquare(c, r));
                     b.appendChild(sq);
                 }
@@ -432,7 +430,7 @@
     function setupModalHTML() {
         return '<div id="ic-setup" class="modal-backdrop"><div class="modal">' +
             '<div class="modal-header"><h2>game setup</h2></div>' +
-            '<p>The piece moves toward the bottom-left corner across the cells of a partition. The last legal move wins.</p>' +
+            '<p>The piece begins in the upper-left corner and moves right or down across the cells of a partition. The last legal move wins.</p>' +
             '<label>Partition — row lengths (longest first)</label>' +
             '<div class="input-group"><input type="text" id="ic-rows" value="6 5 4 3 2" placeholder="e.g. 6 5 4 3 2"></div>' +
             '<label>…or generate one</label>' +
@@ -441,9 +439,6 @@
               '<option value="random">random</option></select>' +
               '<input type="number" id="ic-genn" min="2" max="14" value="6" style="max-width:74px">' +
               '<button type="button" id="ic-genbtn" class="secondary-button">generate</button></div>' +
-            '<label>Start cell</label>' +
-            '<div class="input-group"><select id="ic-start"><option value="far" selected>farthest from corner</option>' +
-              '<option value="random">random</option></select></div>' +
             '<label>Mode</label>' +
             '<div class="input-group"><select id="ic-mode"><option value="normal" selected>Normal (last move wins)</option>' +
               '<option value="misere">Misère (last move loses)</option></select></div>' +
@@ -470,9 +465,8 @@
         });
         document.getElementById("ic-start-btn").addEventListener("click", () => {
             const rows = parsePartition(rowsInput.value);
-            const start = startCell(rows, document.getElementById("ic-start").value);
             begin({
-                rows, c: start[0], r: start[1],
+                rows, c: 0, r: 0,                       // always begin in the upper-left corner
                 mode: document.getElementById("ic-mode").value,
                 ai: document.getElementById("ic-ai").value,
                 diff: +diff.value,
